@@ -5,17 +5,19 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 
 public class Crate extends TestObject implements Triggerable, Updatable{
-    int hp;
+    int hitPoints;
     public Crate(Spatial testObject, Vector3f pos, Quaternion dir, Game game){
         super(testObject, pos, dir, game);
-        this.hp = 100;
+        this.hitPoints = 100;
     }
+    
     public void trigger(){
-        hp -= 30;
-        System.out.println("I was Shot!! => " + hp);
-        if(hp < 0){
+        hitPoints -= 30;
+        System.out.println("I was Shot!! => " + hitPoints);
+        if(hitPoints < 0){
             System.out.println("I was Killed");
             this.destroy();
+            this.game.getScoreBoard().updateScore(10);
         }
     }
 

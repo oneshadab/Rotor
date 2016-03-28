@@ -107,6 +107,9 @@ public class Player implements ActionListener, Updatable{
         inputManager.addListener(al, "Jump");
         inputManager.addListener(al, "Drop");
         inputManager.addListener(al, "Shoot");
+        //Create Crate :D
+        inputManager.addMapping("Crate", new KeyTrigger(KeyInput.KEY_R));
+        inputManager.addListener(al, "Crate");
     }
     
     public void onAction(String bindings, boolean isPressed, float tpf) {
@@ -130,6 +133,18 @@ public class Player implements ActionListener, Updatable{
         }
         else if(bindings.equals("Shoot")){
             if(isPressed) this.fireWeapon();
+        }
+        else if(bindings.equals("Crate")){
+            if(isPressed){
+                Vector3f loc = cam.getLocation();
+                loc.addLocal(cam.getDirection().mult(40));
+                if(loc.y < 0) loc.y = 1;
+                Geometry geom = new Geometry("Box", new Box(10, 10, 10));
+                geom.setMaterial(new Material(game.getAssetManager(), "/Common/MatDefs/Misc/Unshaded.j3md"));
+                //geom.getMaterial().setTexture("ColorMap", game.getAssetManager().loadTexture("Textures/crateTex1.png"));
+                Crate b = new Crate(geom,  
+                                    loc, cam.getRotation(), this.game);
+            }
         }
     }
     

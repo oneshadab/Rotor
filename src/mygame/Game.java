@@ -39,6 +39,7 @@ public class Game extends SimpleApplication{
     BulletAppState bAppState;
     Player player;
     Scene scene;
+    ScoreBoard scoreBoard;
  
      @Override
     public void simpleInitApp() {  
@@ -50,12 +51,12 @@ public class Game extends SimpleApplication{
         
         Weapon revolver = new Weapon(assetManager.loadModel("/Models/wade_high_rez_colt/wade_high_rez_colt.j3o"), 
                                     new Vector3f(10f, 3f, 3f), null, this);
-        Crate b = new Crate(new Geometry("Box", new Box(10, 10, 10)), 
-                                    new Vector3f(-10f, 3f, 3f), null, this);
         player = new Player(new CapsuleCollisionShape(1.5f, 6f, 1), this);
         scene = new Scene(assetManager.loadModel("/Scenes/town/main.scene"), this);
         
         player.setInputMapping(inputManager, player);
+        
+        scoreBoard = new ScoreBoard(0, this);
     }
     
     public void setupCamera(){
@@ -93,6 +94,10 @@ public class Game extends SimpleApplication{
     
     public void addUpdateList(Updatable a){
         updateList.add(a);
+    }
+    
+    public ScoreBoard getScoreBoard(){
+        return scoreBoard;
     }
 
 }
