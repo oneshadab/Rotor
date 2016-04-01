@@ -26,7 +26,8 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.*;import java.util.ArrayList;
+import com.jme3.scene.shape.*;import com.jme3.system.AppSettings;
+import java.util.ArrayList;
 import java.util.List;
 ;
 
@@ -44,6 +45,7 @@ public class Game extends SimpleApplication{
      @Override
     public void simpleInitApp() {  
         
+         
         setupPhysics();
         setupCamera();
         setupLight();
@@ -57,6 +59,11 @@ public class Game extends SimpleApplication{
         player.setInputMapping(inputManager, player);
         
         scoreBoard = new ScoreBoard(0, this);
+    }
+     
+    public void setupSettings(){
+        
+        
     }
     
     public void setupCamera(){

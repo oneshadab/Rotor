@@ -141,7 +141,7 @@ public class Player implements ActionListener, Updatable{
                 if(loc.y < 0) loc.y = 1;
                 Geometry geom = new Geometry("Box", new Box(10, 10, 10));
                 geom.setMaterial(new Material(game.getAssetManager(), "/Common/MatDefs/Misc/Unshaded.j3md"));
-                //geom.getMaterial().setTexture("ColorMap", game.getAssetManager().loadTexture("Textures/crateTex1.png"));
+                geom.getMaterial().setTexture("ColorMap", game.getAssetManager().loadTexture("Textures/crateTex1.png"));
                 Crate b = new Crate(geom,  
                                     loc, cam.getRotation(), this.game);
             }

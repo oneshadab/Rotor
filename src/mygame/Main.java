@@ -1,12 +1,17 @@
 package mygame;
 
+import com.jme3.system.AppSettings;
+
 public class Main {
        
     public static void main(String[] args) {
         Game app = new Game();
-        app.setShowSettings(false);
-        app.setDisplayFps(false);
+        AppSettings settings = new AppSettings(true);
+        settings.setFrameRate(60);
+        app.setSettings(settings);
+        //app.setDisplayFps(false);
         app.setDisplayStatView(false);
+        app.setShowSettings(false);
         app.start();
     }
 }
