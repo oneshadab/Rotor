@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Projectile implements Updatable{
+    int remainingFrames = 500;
     Game game;
     Node rootNode;
     BulletAppState bAppState;
@@ -68,8 +69,14 @@ public class Projectile implements Updatable{
     
     public void update(){
         if(ghostControl == null) return;
-        updatePosition();
-        checkOverlap();
+        if(remainingFrames <= 0) this.destroy(); 
+        remainingFrames -= 1;
+        for(int i = 0; i < 50; i++){
+            if(ghostControl == null) return;
+            updatePosition();
+            checkOverlap();
+        }
+        
     }
     
     public void updatePosition(){
