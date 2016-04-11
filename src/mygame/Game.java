@@ -58,7 +58,11 @@ public class Game extends SimpleApplication{
         
         player.setInputMapping(inputManager, player);
         
+        
         scoreBoard = new ScoreBoard(0, this);
+        
+        Enemy oto = new Enemy(assetManager.loadModel("Models/Oto/Oto.mesh.xml"), this);
+        oto.setInputMapping(inputManager, oto);
     }
      
     public void setupSettings(){

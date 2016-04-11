@@ -32,6 +32,8 @@ public class Scene {
         this.rootNode = game.getRootNode();
         this.bAppState = game.getBulletAppState();
         
+        Node t;
+        
         sceneModel.setLocalScale(2f);
         sceneShape = CollisionShapeFactory.createMeshShape(sceneModel);
         this.setupControls();
