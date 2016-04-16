@@ -26,11 +26,13 @@ public class Projectile implements Updatable{
     Vector3f pos;
     Vector3f dir;
     Quaternion rot;
+    boolean visible;
     
-    public Projectile(Game game, Vector3f pos, Quaternion rot , Vector3f dir){
+    public Projectile(Game game, Vector3f pos, Quaternion rot , Vector3f dir, boolean visible){
         this.pos = pos;
         this.rot = rot;
         this.dir = dir.multLocal(.1f);
+        this.visible = visible;
         
         this.game = game;
         
@@ -46,11 +48,15 @@ public class Projectile implements Updatable{
         ghostControl = new GhostControl(CollisionShapeFactory.createBoxShape(shape));
         shape.addControl(ghostControl);
         
-        rootNode.attachChild(shape);
+        if(visible) rootNode.attachChild(shape);
         bAppState.getPhysicsSpace().add(ghostControl);
         
         setupPosition();
         addUpdate();
+    }
+    
+    public Projectile(Game game, Vector3f pos, Quaternion rot , Vector3f dir){
+        this(game, pos, rot, dir, true);
     }
     
     public void setupPosition(){

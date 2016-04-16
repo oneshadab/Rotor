@@ -35,10 +35,11 @@ public class Player implements ActionListener, Updatable{
     Camera cam;
     BulletAppState bAppState;
     
+    Node playerNode;
     Spatial playerModel;
     float playerHeight;
     CharacterControl playerControl;
-    GhostControl ghostControl;
+    ObjectGhostControl ghostControl;
     CapsuleCollisionShape playerShape;
     Spatial weapon;
   
@@ -60,15 +61,18 @@ public class Player implements ActionListener, Updatable{
         this.playerHeight = 0.05f;
         this.cam = game.getCamera();
         
+        
         playerModel = new Geometry("Player", new Box(1, 1, 1));
         playerModel.setMaterial(new Material(game.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md"));
-        rootNode.attachChild(playerModel);
+        game.getVisibleNode().attachChild(playerModel);
+        
         setupControls();
        
         enablePhysics();
         addUpdate();
         
     }
+    
     
     public void enablePhysics(){
         bAppState.getPhysicsSpace().add(playerControl);
@@ -86,8 +90,9 @@ public class Player implements ActionListener, Updatable{
         playerControl.setPhysicsLocation(new Vector3f(0, 10, 0));
         
         
-        ghostControl = new GhostControl(playerShape);
+        ghostControl = new ObjectGhostControl(playerShape, this);
         playerModel.addControl(ghostControl);
+        
         
         
     }
@@ -139,11 +144,7 @@ public class Player implements ActionListener, Updatable{
                 Vector3f loc = cam.getLocation();
                 loc.addLocal(cam.getDirection().mult(40));
                 if(loc.y < 0) loc.y = 1;
-                Geometry geom = new Geometry("Box", new Box(10, 10, 10));
-                geom.setMaterial(new Material(game.getAssetManager(), "/Common/MatDefs/Misc/Unshaded.j3md"));
-                geom.getMaterial().setTexture("ColorMap", game.getAssetManager().loadTexture("Textures/crateTex1.png"));
-                Crate b = new Crate(geom,  
-                                    loc, cam.getRotation(), this.game);
+                Crate b = new Crate(loc, cam.getRotation(), this.game);
             }
         }
     }

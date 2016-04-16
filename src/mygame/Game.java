@@ -25,6 +25,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.*;import com.jme3.system.AppSettings;
 import java.util.ArrayList;
@@ -37,59 +38,48 @@ import java.util.List;
  */
 public class Game extends SimpleApplication{
     ArrayList<Updatable> updateList;
+    ArrayList<Level> levelList;
     BulletAppState bAppState;
     Player player;
     Scene scene;
     ScoreBoard scoreBoard;
- 
-     @Override
+    Level currentLevel;
+    boolean changeLevel;
+    Node visibleNode;
+    
     public void simpleInitApp() {  
-        
-         
-        setupPhysics();
-        setupCamera();
-        setupLight();
         updateList = new ArrayList<Updatable>();
+        visibleNode = new Node();
+        rootNode.attachChild(visibleNode);
         
-        Weapon revolver = new Weapon(assetManager.loadModel("/Models/wade_high_rez_colt/wade_high_rez_colt.j3o"), 
-                                    new Vector3f(10f, 3f, 3f), null, this);
-        player = new Player(new CapsuleCollisionShape(1.5f, 6f, 1), this);
-        scene = new Scene(assetManager.loadModel("/Scenes/town/main.scene"), this);
-        
-        player.setInputMapping(inputManager, player);
-        
-        
-        scoreBoard = new ScoreBoard(0, this);
-        
-        Enemy oto = new Enemy(assetManager.loadModel("Models/Oto/Oto.mesh.xml"), this);
-        oto.setInputMapping(inputManager, oto);
+        currentLevel = new TutorialLevel(this);
     }
      
-    public void setupSettings(){
-        
-        
+    public Node getVisibleNode(){
+        return visibleNode;
     }
     
-    public void setupCamera(){
-        viewPort.setBackgroundColor(new ColorRGBA(0.7f, 0.8f, 1f, 1f));
-        flyCam.setMoveSpeed(100);
+    public Level getCurrentLevel(){
+        return currentLevel;
     }
     
-    public void setupPhysics(){
-        bAppState = new BulletAppState();
-        stateManager.attach(bAppState);
-        //bAppState.getPhysicsSpace().enableDebug(assetManager);
+    public void setCurrentLevel(Level currentLevel){
+        this.currentLevel = currentLevel;
     }
+   
 
     public void setupLight(){
         AmbientLight amb = new AmbientLight();
         amb.setColor(ColorRGBA.White.mult(1.3f));
         rootNode.addLight(amb);
         
+        
         DirectionalLight dl = new DirectionalLight();
         dl.setColor(ColorRGBA.White);
         dl.setDirection(new Vector3f(2.8f, -2.8f, -2.8f).normalizeLocal());
         rootNode.addLight(dl);
+        
+        
     }
     
 
@@ -97,6 +87,19 @@ public class Game extends SimpleApplication{
         for(Updatable up: updateList){
             up.update();
         }
+        if(changeLevel){
+            currentLevel.nextLevel();
+            changeLevel = false;
+        }
+    }
+
+    
+    public void setChangeLevel(boolean changeLevel){
+        this.changeLevel = changeLevel;
+    }
+    
+    public void setBulletAppState(BulletAppState bAppState){
+        this.bAppState = bAppState;
     }
     
     public BulletAppState getBulletAppState(){
@@ -106,6 +109,7 @@ public class Game extends SimpleApplication{
     public void addUpdateList(Updatable a){
         updateList.add(a);
     }
+    
     
     public ScoreBoard getScoreBoard(){
         return scoreBoard;

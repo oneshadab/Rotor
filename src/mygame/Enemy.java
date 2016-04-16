@@ -9,15 +9,18 @@ import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.collision.shapes.HullCollisionShape;
 import com.jme3.bullet.control.CharacterControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.collision.CollisionResults;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
-public class Enemy implements ActionListener, Updatable, AnimEventListener{
+public class Enemy implements ActionListener, Updatable, AnimEventListener, Triggerable{
     Spatial shape;
     CharacterControl enemyControl;
     Game game;
@@ -54,7 +57,7 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener{
         control.addListener(this);
         channel.setAnim("stand");
         
-        enemyControl = new CharacterControl(new CapsuleCollisionShape(1.5f, 6.5f, 1), 10);
+        enemyControl = new CharacterControl(new CapsuleCollisionShape(1.5f, 6.5f, 1), 6.5f);
         shape.addControl(enemyControl);
         enemyControl.setJumpSpeed(15);
         enemyControl.setGravity(30);
@@ -95,6 +98,27 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener{
     public void update() {
         animateWalk();
         moveWalk();
+        shootPlayer();
+    }
+    static int cnt = 0;
+    public void shootPlayer(){
+        
+        CollisionResults results = new CollisionResults();
+        Vector3f x = game.currentLevel.getPlayer().playerModel.getWorldTranslation().subtract(shape.getWorldTranslation());
+        Ray ray = new Ray(shape.getWorldTranslation(), x);
+        game.getVisibleNode().collideWith(ray, results);
+        
+        System.out.println(results.size());
+        for(int i = 0; i < results.size(); i++){
+            System.out.println(results.getCollision(i).getGeometry().getName());
+
+        }
+    }
+    
+    public void lookAtPlayer(){
+         //System.out.println(shape.getWorldRotation());
+        Vector3f x = game.currentLevel.getPlayer().playerModel.getWorldTranslation().subtract(shape.getWorldTranslation());
+        enemyControl.setViewDirection(x);
     }
     
     public void moveWalk(){
@@ -110,5 +134,10 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener{
     }
 
     public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
+    }
+
+    public void trigger(){
+        System.out.println("Player is Visible" + ++cnt);
+        lookAtPlayer();
     }
 }

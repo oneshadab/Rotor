@@ -38,6 +38,6 @@ public class Scene {
         sceneShape = CollisionShapeFactory.createMeshShape(sceneModel);
         this.setupControls();
         
-        rootNode.attachChild(sceneModel);
+        game.getVisibleNode().attachChild(sceneModel);
     }
 }
