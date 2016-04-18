@@ -52,7 +52,7 @@ public class Game extends SimpleApplication{
         visibleNode = new Node();
         rootNode.attachChild(visibleNode);
         
-        currentLevel = new TutorialLevel(this);
+        currentLevel = new TownLevel(this);
     }
      
     public Node getVisibleNode(){

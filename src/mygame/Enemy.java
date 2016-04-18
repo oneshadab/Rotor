@@ -29,14 +29,25 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
     
     AnimChannel channel;
     AnimControl control;
-    
+    Vector3f prevPos;
+    int moveCount = 0;
+    int moveLimit;
     boolean walk = false;
     
-    public Enemy(Spatial shape, Game game){
-        this.shape = shape;        
+    public Enemy(Game game){
+        this(new Vector3f(15, 15, 0), 500, game);
+    }
+    
+    public Enemy(Vector3f pos, Game game){
+        this(pos, 500, game);
+    }
+    
+    public Enemy(Vector3f pos, int moveLimit, Game game){
+        this.shape = game.getAssetManager().loadModel("Models/Oto/Oto.mesh.xml");        
         this.game = game;
         this.rootNode = game.getRootNode();
         this.bAppState = game.getBulletAppState();
+        this.moveLimit = moveLimit;
         
         this.addUpdate();
         setupControls();
@@ -45,7 +56,7 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
         
         rootNode.attachChild(shape);
         bAppState.getPhysicsSpace().add(enemyControl);
-        enemyControl.setPhysicsLocation(new Vector3f(15, 15, 0));
+        enemyControl.setPhysicsLocation(pos);
 
         
         
@@ -98,9 +109,19 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
     public void update() {
         animateWalk();
         moveWalk();
+        //lookAtPlayer();
+        moveSteps();
         shootPlayer();
     }
-    static int cnt = 0;
+    
+    public void moveSteps(){
+        //System.out.println(moveCount);
+        if(walk) moveCount += 1;
+        if(moveCount > moveLimit){
+            moveCount = 0;
+            enemyControl.setViewDirection(enemyControl.getViewDirection().negate());
+        }
+    }
     public void shootPlayer(){
         
         CollisionResults results = new CollisionResults();
@@ -108,9 +129,9 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
         Ray ray = new Ray(shape.getWorldTranslation(), x);
         game.getVisibleNode().collideWith(ray, results);
         
-        System.out.println(results.size());
+        //System.out.println(results.size());
         for(int i = 0; i < results.size(); i++){
-            System.out.println(results.getCollision(i).getGeometry().getName());
+            //System.out.println(results.getCollision(i).getGeometry().getName());
 
         }
     }
@@ -121,12 +142,20 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
         enemyControl.setViewDirection(x);
     }
     
+    
     public void moveWalk(){
         Vector3f walkDir = new Vector3f(0, 0 ,0);
-        if(walk) walkDir.addLocal(shape.getLocalRotation().getRotationColumn(2).mult(0.1f));
+        if(walk)walkDir.addLocal(shape.getLocalRotation().getRotationColumn(2).mult(0.1f));
         
-        
+        Vector3f currentPos = shape.getWorldTranslation();
+        if(prevPos != null){
+            Vector3f diff = currentPos.subtract(prevPos);
+            System.out.println(diff);
+            //if(Math.abs(diff.x) <= .000001 && Math.abs(diff.y) <= .000001 && Math.abs(diff.z) <= .000001)
+                //enemyControl.setViewDirection(walkDir.negate());
+        }
         enemyControl.setWalkDirection(walkDir);
+        //System.out.println(prevPos);
     }
 
     public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
@@ -137,7 +166,7 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
     }
 
     public void trigger(){
-        System.out.println("Player is Visible" + ++cnt);
+        //System.out.println("Player is Visible" + ++cnt);
         lookAtPlayer();
     }
 }
