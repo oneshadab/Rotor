@@ -19,23 +19,32 @@ public class TownLevel extends Level{
     Scene scene;
     ScoreBoard scoreBoard;
 
+    public TownLevel(Game game, Player player){
+        this(game);
+        this.player = player;
+        player.setInputMapping(inputManager, player);
+    }
+    
     public TownLevel(Game game) {  
         super(game);     
-        Weapon revolver = new Weapon(assetManager.loadModel("/Models/wade_high_rez_colt/wade_high_rez_colt.j3o"), 
-                                    new Vector3f(10f, 3f, 3f), null, game);
-        player = new Player(new CapsuleCollisionShape(1.5f, 6f, 1), game);
-        scene = new Scene(assetManager.loadModel("/Scenes/town/main.scene"), game);
-
+        //Model is not the Right size [Need to Fix]
+        Assault assault = new Assault( new Vector3f(-110, 10, 110), game);
+        scene = new Scene(assetManager.loadModel("/Scenes/town/main.j3o"), game);
+        
+        player = new Player(new Vector3f(-120, 10, 120), new CapsuleCollisionShape(1.5f, 6f, 1), game);
         player.setInputMapping(inputManager, player);
         
         
-        scoreBoard = new ScoreBoard(0, game);
+        scoreBoard = new ScoreBoard(game);
         
-        Enemy oto = new Enemy(game);
-        oto.setInputMapping(inputManager, oto);
+        Enemy oto1 = new Enemy(game);
+        Enemy oto2 = new Enemy(new Vector3f(0, 10f, -70f), game);
+        Enemy oto3 = new Enemy(new Vector3f(220, 10f, -40f), game);
+
         
-        Exit exit = new Exit(new Vector3f(201f, 3f, -18f), Quaternion.IDENTITY, game);
-        exit.testObject.setLocalScale(0.6f);
+        Exit exit = new Exit(new Vector3f(201f, 3f, -18f), Quaternion.IDENTITY, game, 0.6f);
+        
+        //
     }
 
     @Override

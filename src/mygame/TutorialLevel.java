@@ -33,9 +33,11 @@ public class TutorialLevel extends Level{
         this.assetManager = game.getAssetManager();
         this.inputManager = game.getInputManager();
         
-        Weapon revolver = new Weapon(assetManager.loadModel("/Models/wade_high_rez_colt/wade_high_rez_colt.j3o"), 
-                                    new Vector3f(10f, 3f, 3f), null, game);
-        player = new Player(new CapsuleCollisionShape(1.5f, 6f, 1), game);
+        scoreBoard = new ScoreBoard(100, 0, game);
+
+        
+        Revolver revolver = new Revolver(new Vector3f(-5f, 10f, 35f), game);
+        player = new Player(new Vector3f(10f, 10f, 35f), new CapsuleCollisionShape(1.5f, 6f, 1), game);
         scene = new Scene(assetManager.loadModel("/Scenes/tutorialLevel/tutorialLevel.j3o"), game);
                 
         
@@ -44,9 +46,8 @@ public class TutorialLevel extends Level{
         player.setInputMapping(inputManager, player);
         
         
-        scoreBoard = new ScoreBoard(0, game);
         
-        Enemy oto = new Enemy(new Vector3f(0, 0, -35), game);
+        Enemy oto = new Enemy(new Vector3f(0, 0, -35), 250, game);
         oto.setInputMapping(inputManager, oto);
         
         //Material
@@ -55,7 +56,7 @@ public class TutorialLevel extends Level{
         //mat.setColor("Color", ColorRGBA.Blue);
         mat.setTexture("ColorMap", assetManager.loadTexture("Textures/crateTex1.png"));
         //scene.sceneModel.setMaterial(mat);
-        Exit exitBox = new Exit(new Vector3f(47f, 3f, 0f), Quaternion.IDENTITY, game);
+        Exit exitBox = new Exit(new Vector3f(47f, 3f, 0f), Quaternion.IDENTITY, game, .2f);
     }
 
     public Player getPlayer(){

@@ -22,12 +22,12 @@ import com.jme3.scene.Spatial;
  *
  * @author Shadab
  */
-public class TestObject{
+public class GameObject{
     Game game;
-    Spatial testObject;
-    float testWeight;
-    RigidBodyControl testControl;
-    TestGhostControl ghostControl;
+    Spatial shape;
+    float shapeWeight;
+    RigidBodyControl objectControl;
+    ObjectGhostControl ghostControl;
     Node rootNode;
     BulletAppState bAppState;
     CollisionShape testShape;
@@ -36,30 +36,34 @@ public class TestObject{
     
     
     
-    public TestObject(Spatial testObject, Vector3f pos, Quaternion dir, Game game){
+    public GameObject(Spatial testObject, Vector3f pos, Quaternion dir, Game game, float localScale){
         this.game = game;
-        this.testObject = testObject;
+        this.shape = testObject;
         this.rootNode = game.getRootNode();
         this.bAppState = game.getBulletAppState();
-        this.testWeight = 0.3f;
+        this.shapeWeight = 0.3f;
         
-        testObject.setLocalScale(.2f);
+        testObject.setLocalScale(localScale);
         setupAll();
         if(testObject instanceof Geometry && ((Geometry)testObject).getMaterial() == null){
             ((Geometry)testObject).setMaterial(new Material(game.getAssetManager(), "/Common/MatDefs/Misc/Unshaded.j3md"));
         }
-        if(pos != null) testControl.setPhysicsLocation(pos);
-        if(dir != null) testControl.setPhysicsRotation(dir);
+        if(pos != null) objectControl.setPhysicsLocation(pos);
+        if(dir != null) objectControl.setPhysicsRotation(dir);
         
     }
     
+    public GameObject(Spatial testObject, Vector3f pos, Quaternion dir, Game game){
+        this(testObject, pos, dir, game, .2f);
+    }
+    
     public void setupControls(){
-        testControl = new RigidBodyControl(testShape, testWeight);
-        testObject.addControl(testControl);
+        objectControl = new RigidBodyControl(testShape, shapeWeight);
+        shape.addControl(objectControl);
         
         
-        ghostControl = new TestGhostControl(testShape, this);
-        testObject.addControl(ghostControl);
+        ghostControl = new ObjectGhostControl(testShape, this);
+        shape.addControl(ghostControl);
         
 
     }
@@ -68,26 +72,26 @@ public class TestObject{
     
     
     public void setupAll(){
-        testShape = CollisionShapeFactory.createBoxShape(testObject);
+        testShape = CollisionShapeFactory.createBoxShape(shape);
         this.setupControls();
         this.enablePhysics();
-        rootNode.attachChild(testObject);
+        rootNode.attachChild(shape);
 
     }
     
     
     public Spatial getSpatial(){
-        return testObject;
+        return shape;
     }
     
     public void disablePhysics(){
-        bAppState.getPhysicsSpace().remove(testControl);
+        bAppState.getPhysicsSpace().remove(objectControl);
         bAppState.getPhysicsSpace().remove(ghostControl);
     }
     
     public void enablePhysics(){
         bAppState.getPhysicsSpace().add(ghostControl);
-        bAppState.getPhysicsSpace().add(testControl);
+        bAppState.getPhysicsSpace().add(objectControl);
     }
     
 }

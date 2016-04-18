@@ -8,8 +8,8 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import java.util.List;
 
-public class Exit extends TestObject implements Updatable{
-    public Exit(Vector3f pos, Quaternion dir, final Game game){
+public class Exit extends GameObject implements Updatable{
+    public Exit(Vector3f pos, Quaternion dir, final Game game, float scale){
         super(new Geometry("Box", new Box(2, 30, 15)){
                  public Geometry init(){
                      this.setMaterial(new Material(game.getAssetManager(), "/Common/MatDefs/Misc/Unshaded.j3md"));
@@ -17,7 +17,7 @@ public class Exit extends TestObject implements Updatable{
                      return this;
                  }
               }.init(),
-                pos, dir, game);
+                pos, dir, game, scale);
         disablePhysics();
         addUpdate();
         bAppState.getPhysicsSpace().add(ghostControl);

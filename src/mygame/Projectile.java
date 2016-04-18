@@ -25,14 +25,17 @@ public class Projectile implements Updatable{
     
     Vector3f pos;
     Vector3f dir;
+    Vector3f dirMove;
     Quaternion rot;
     boolean visible;
     
-    public Projectile(Game game, Vector3f pos, Quaternion rot , Vector3f dir, boolean visible){
+    public Projectile(Game game, Vector3f pos, Quaternion rot , Vector3f dir, boolean visible, ColorRGBA color){
         this.pos = pos;
         this.rot = rot;
-        this.dir = dir.multLocal(.1f);
+        this.dir = dir.multLocal(.01f);
         this.visible = visible;
+        this.dirMove = dir.normalize().mult(.1f);
+        //System.out.println(dirMove);
         
         this.game = game;
         
@@ -41,20 +44,26 @@ public class Projectile implements Updatable{
         this.shape = new Geometry("Projectile", new Box(1, 1, 5));
         
         Material mat = new Material(game.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.Blue);
+        mat.setColor("Color", color);
         shape.setMaterial(mat);
         
-        shape.setLocalScale(.05f);
+        shape.setLocalScale(.5f);
+        shape.setLocalTranslation(pos);
         ghostControl = new GhostControl(CollisionShapeFactory.createBoxShape(shape));
         shape.addControl(ghostControl);
         
         if(visible) rootNode.attachChild(shape);
         bAppState.getPhysicsSpace().add(ghostControl);
         
-        setupPosition();
+        //setupPosition();
+        shape.rotate(rot);
         addUpdate();
+        //System.out.println(shape.getWorldTranslation());
     }
     
+    public Projectile(Game game, Vector3f pos, Quaternion rot , Vector3f dir, boolean visible){
+        this(game, pos, rot, dir, visible, ColorRGBA.Blue);
+    }
     public Projectile(Game game, Vector3f pos, Quaternion rot , Vector3f dir){
         this(game, pos, rot, dir, true);
     }
@@ -66,7 +75,7 @@ public class Projectile implements Updatable{
         Quaternion worldDiff = new Quaternion(rot.mult(shape.getWorldRotation().inverse()));
         worldDiff.multLocal(shape.getLocalRotation());
         shape.setLocalRotation(worldDiff);
-        shape.move(dir.mult(100));
+        //shape.move(dir.mult(100));
     }
     
     public void addUpdate(){
@@ -82,12 +91,12 @@ public class Projectile implements Updatable{
             updatePosition();
             checkOverlap();
         }
-        
+        //System.out.println(shape.getWorldTranslation());
     }
     
     public void updatePosition(){
         
-        shape.move(dir);
+        shape.move(dirMove);
         
         //System.out.println(++x + " " + shape.getLocalTranslation()); 
     }
@@ -95,11 +104,14 @@ public class Projectile implements Updatable{
     public void checkOverlap(){
         List<PhysicsCollisionObject> AL = ghostControl.getOverlappingObjects();
         for(Object a: AL){
-            if(a instanceof TestGhostControl && ((TestGhostControl)a).getTestObject() instanceof Triggerable){
-                Triggerable t = (Triggerable)(((TestGhostControl)a).getTestObject());
-                t.trigger();
-                this.destroy();
-                break;
+            if(a instanceof ObjectGhostControl){
+                if (((ObjectGhostControl)a).getObject() instanceof Triggerable){
+                    Triggerable t = (Triggerable)(((ObjectGhostControl)a).getObject());
+                    t.trigger();
+                    this.destroy();
+                    break;
+                }
+                
             }  
         }
     }

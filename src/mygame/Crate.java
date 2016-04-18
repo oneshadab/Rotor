@@ -7,7 +7,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 
-public class Crate extends TestObject implements Triggerable, Updatable{
+public class Crate extends GameObject implements Triggerable, Updatable{
     int hitPoints;
     public Crate(Vector3f pos, Quaternion dir, final Game game){
         super(new Geometry("Box", new Box(10, 10, 10)){
@@ -25,9 +25,9 @@ public class Crate extends TestObject implements Triggerable, Updatable{
         hitPoints -= 30;
         System.out.println("I was Shot!! => " + hitPoints);
         if(hitPoints < 0){
-            System.out.println("I was Killed");
+            //System.out.println("I was Killed");
             this.destroy();
-            this.game.getScoreBoard().updateScore(10);
+            //this.game.getScoreBoard().updateScore(10);
         }
     }
 
@@ -40,6 +40,6 @@ public class Crate extends TestObject implements Triggerable, Updatable{
     
     public void destroy(){
         disablePhysics();
-        rootNode.detachChild(testObject);
+        rootNode.detachChild(shape);
     }
 }

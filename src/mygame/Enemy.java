@@ -14,6 +14,7 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
@@ -23,6 +24,7 @@ import com.jme3.scene.Spatial;
 public class Enemy implements ActionListener, Updatable, AnimEventListener, Triggerable{
     Spatial shape;
     CharacterControl enemyControl;
+    ObjectGhostControl ghostControl;
     Game game;
     Node rootNode;
     BulletAppState bAppState;
@@ -33,6 +35,8 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
     int moveCount = 0;
     int moveLimit;
     boolean walk = false;
+    long currentTime, prevTime;
+    int health;
     
     public Enemy(Game game){
         this(new Vector3f(15, 15, 0), 500, game);
@@ -48,6 +52,7 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
         this.rootNode = game.getRootNode();
         this.bAppState = game.getBulletAppState();
         this.moveLimit = moveLimit;
+        this.health = 100;
         
         this.addUpdate();
         setupControls();
@@ -55,11 +60,13 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
         
         
         rootNode.attachChild(shape);
+        
         bAppState.getPhysicsSpace().add(enemyControl);
+        bAppState.getPhysicsSpace().add(ghostControl);
         enemyControl.setPhysicsLocation(pos);
 
-        
-        
+        walk = true;
+        prevTime = System.currentTimeMillis();
     }
     
     public void setupControls(){
@@ -74,6 +81,8 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
         enemyControl.setGravity(30);
         enemyControl.setFallSpeed(30);
         
+        ghostControl = new ObjectGhostControl(new CapsuleCollisionShape(1.5f, 6.5f, 1), this);
+        shape.addControl(ghostControl);
         
 
     }
@@ -85,7 +94,8 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
     
     public void onAction(String name, boolean isPressed, float tpf) {
         if(name.equals("Walk")){
-            walk = isPressed;
+            lookAtPlayer();
+            shootProjectile();
         }
     }
     
@@ -107,11 +117,12 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
     }
 
     public void update() {
-        animateWalk();
-        moveWalk();
-        //lookAtPlayer();
-        moveSteps();
-        shootPlayer();
+        if(health > 0){
+            animateWalk();
+            moveWalk();
+            moveSteps();
+            shootPlayer();
+        }
     }
     
     public void moveSteps(){
@@ -123,23 +134,46 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
         }
     }
     public void shootPlayer(){
-        
-        CollisionResults results = new CollisionResults();
-        Vector3f x = game.currentLevel.getPlayer().playerModel.getWorldTranslation().subtract(shape.getWorldTranslation());
-        Ray ray = new Ray(shape.getWorldTranslation(), x);
-        game.getVisibleNode().collideWith(ray, results);
-        
-        //System.out.println(results.size());
-        for(int i = 0; i < results.size(); i++){
+        if((game.getCurrentLevel().getPlayer().playerModel.getWorldTranslation().distance(shape.getWorldTranslation()) < 50) ||
+           (health < 100 && game.getCurrentLevel().getPlayer().playerModel.getWorldTranslation().distance(shape.getWorldTranslation()) < 250)    ){
+            lookAtPlayer();
+            shootProjectile();
+        }
+        else{
+            walk = true;
+        }
+        //
+//        CollisionResults results = new CollisionResults();
+//        Vector3f x = game.currentLevel.getPlayer().playerModel.getWorldTranslation().subtract(shape.getWorldTranslation());
+//        Ray ray = new Ray(shape.getWorldTranslation(), x);
+//        game.getVisibleNode().collideWith(ray, results);
+//        
+//        //System.out.println(results.size());
+//        for(int i = 0; i < results.size(); i++){
             //System.out.println(results.getCollision(i).getGeometry().getName());
 
-        }
+//        }
     }
     
     public void lookAtPlayer(){
          //System.out.println(shape.getWorldRotation());
         Vector3f x = game.currentLevel.getPlayer().playerModel.getWorldTranslation().subtract(shape.getWorldTranslation());
         enemyControl.setViewDirection(x);
+    }
+    
+    public void shootProjectile(){
+        Quaternion q = new Quaternion();
+        q.lookAt(enemyControl.getViewDirection(), Vector3f.UNIT_Y);
+        Vector3f x = game.currentLevel.getPlayer().playerModel.getWorldTranslation().subtract(shape.getWorldTranslation().add(new Vector3f(0, 4f, 0)));
+        Vector3f y = shape.getWorldTranslation().add(new Vector3f(0, 4f, 0).add(enemyControl.getWalkDirection().normalize().mult(8)));
+        //System.out.println(enemyControl.getViewDirection());
+        //System.out.println("Shape: " + shape.getWorldTranslation());
+        //System.out.println("Player: " + game.getCurrentLevel().getPlayer().playerModel.getWorldTranslation());
+        currentTime = System.currentTimeMillis();
+        if(currentTime - prevTime > 1000){
+           new Projectile(game, y, q, x);
+           prevTime = currentTime;
+        }
     }
     
     
@@ -165,8 +199,16 @@ public class Enemy implements ActionListener, Updatable, AnimEventListener, Trig
     public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
     }
 
+    public void dispose(){
+        rootNode.detachChild(shape);
+        bAppState.getPhysicsSpace().remove(enemyControl);
+        bAppState.getPhysicsSpace().remove(ghostControl);
+        ScoreBoard.points += 10;
+    }
+    
     public void trigger(){
-        //System.out.println("Player is Visible" + ++cnt);
-        lookAtPlayer();
+        //System.out.println("EnemyHit!! " + health);
+        health -= 30;
+        if(health <= 0) this.dispose();
     }
 }

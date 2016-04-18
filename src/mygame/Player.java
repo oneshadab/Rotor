@@ -29,7 +29,7 @@ import com.jme3.scene.shape.Box;
  *
  * @author Shadab
  */
-public class Player implements ActionListener, Updatable{
+public class Player implements ActionListener, Updatable, Triggerable{
     Game game;
     Node rootNode;
     Camera cam;
@@ -48,11 +48,16 @@ public class Player implements ActionListener, Updatable{
     Vector3f camDir = new Vector3f();
     Vector3f walkDir = new Vector3f();
     Vector3f camLeft = new Vector3f();
+    int health;
     
     boolean left, right, up, down;
     
-
+    
     public Player(CapsuleCollisionShape playerShape, Game game){
+        this(new Vector3f(0, 10, 0), playerShape, game);
+    }
+
+    public Player(Vector3f pos, CapsuleCollisionShape playerShape, Game game){
         this.game = game;
         this.playerShape = playerShape;
         
@@ -60,17 +65,19 @@ public class Player implements ActionListener, Updatable{
         this.bAppState = game.getBulletAppState();
         this.playerHeight = 0.05f;
         this.cam = game.getCamera();
+        this.health = ScoreBoard.health;
         
         
         playerModel = new Geometry("Player", new Box(1, 1, 1));
-        playerModel.setMaterial(new Material(game.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md"));
-        game.getVisibleNode().attachChild(playerModel);
-        
+        playerModel.setMaterial(new Material(game.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md"));        game.getVisibleNode().attachChild(playerModel);
+
         setupControls();
        
         enablePhysics();
         addUpdate();
         
+       playerControl.setPhysicsLocation(pos);
+
     }
     
     
@@ -87,7 +94,6 @@ public class Player implements ActionListener, Updatable{
         playerControl.setJumpSpeed(15);
         playerControl.setGravity(30);
         playerControl.setFallSpeed(30);
-        playerControl.setPhysicsLocation(new Vector3f(0, 10, 0));
         
         
         ghostControl = new ObjectGhostControl(playerShape, this);
@@ -213,8 +219,8 @@ public class Player implements ActionListener, Updatable{
     
     public void pickupWeapon(){
         for(Object a: ghostControl.getOverlappingObjects()){
-            if(a instanceof TestGhostControl && ((TestGhostControl)a).getTestObject() instanceof Weapon){
-                weaponObject = (Weapon)(((TestGhostControl)a).getTestObject());
+            if(a instanceof ObjectGhostControl && ((ObjectGhostControl)a).getObject() instanceof Weapon){
+                weaponObject = (Weapon)(((ObjectGhostControl)a).getObject());
             }
         }
         if(weaponObject == null) return;
@@ -228,10 +234,10 @@ public class Player implements ActionListener, Updatable{
         
         //camDir.set(cam.getDirection()).multLocal(0.6f);
         weaponObject.enablePhysics();
-        weaponObject.testControl.setPhysicsLocation(weapon.getWorldTranslation());
-        weaponObject.testControl.setPhysicsRotation(Matrix3f.ZERO);
+        weaponObject.objectControl.setPhysicsLocation(weapon.getWorldTranslation());
+        weaponObject.objectControl.setPhysicsRotation(Matrix3f.ZERO);
         
-        weaponObject.testControl.applyImpulse(cam.getDirection().mult(2f), Vector3f.ZERO);
+        weaponObject.objectControl.applyImpulse(cam.getDirection().mult(2f), Vector3f.ZERO);
         weapon = null;
         weaponObject = null;
         
@@ -241,5 +247,15 @@ public class Player implements ActionListener, Updatable{
         if(weaponObject != null){
             weaponObject.shoot(); 
         }
+    }
+
+    public void destroy(){
+        game.setGameOver(true);
+    }
+    
+    public void trigger() {
+        //System.out.println("player was hit!!");
+        health -= 10;
+        if(health <= 0) this.destroy();
     }
 }

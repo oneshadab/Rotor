@@ -14,18 +14,15 @@ import com.jme3.scene.Spatial;
  *
  * @author Shadab
  */
-public class Scene {
+public class Scene implements Triggerable{
     Spatial sceneModel;
     RigidBodyControl sceneControl;
     Node rootNode;
     BulletAppState bAppState;
     CollisionShape sceneShape;
+    ObjectGhostControl ghostControl;
 
-    public void setupControls(){
-        sceneControl = new RigidBodyControl(sceneShape, 0);
-        sceneModel.addControl(sceneControl);
-        bAppState.getPhysicsSpace().add(sceneControl);
-    }
+   
     
     public Scene(Spatial sceneModel, Game game){
         this.sceneModel = sceneModel;
@@ -39,5 +36,19 @@ public class Scene {
         this.setupControls();
         
         game.getVisibleNode().attachChild(sceneModel);
+    }
+
+     public void setupControls(){
+        //ghostControl = new ObjectGhostControl(sceneShape, this);
+        //sceneModel.addControl(ghostControl);
+        //bAppState.getPhysicsSpace().add(ghostControl);
+        sceneControl = new RigidBodyControl(sceneShape, 0);
+        sceneModel.addControl(sceneControl);
+        bAppState.getPhysicsSpace().add(sceneControl);
+        
+
+    }
+     
+    public void trigger() {
     }
 }

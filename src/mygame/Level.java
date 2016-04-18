@@ -77,13 +77,16 @@ public abstract class Level{
       
     public void dispose(){
         //game.updateList.clear();
+        game.clearUpdateList();
         rootNode.detachAllChildren();
         game.getVisibleNode().detachAllChildren();
+        game.getGuiNode().detachAllChildren();
         
         removeLight();
         game.getStateManager().detach(bAppState);
         rootNode.attachChild(game.getVisibleNode());
-        game.getInputManager().clearMappings();
+        if(getPlayer() != null) getPlayer().dropWeapon();
+        //game.getInputManager().clearMappings();
         
     }
     

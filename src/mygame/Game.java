@@ -38,6 +38,7 @@ import java.util.List;
  */
 public class Game extends SimpleApplication{
     ArrayList<Updatable> updateList;
+    ArrayList<Updatable> updateBuffer;
     ArrayList<Level> levelList;
     BulletAppState bAppState;
     Player player;
@@ -45,14 +46,16 @@ public class Game extends SimpleApplication{
     ScoreBoard scoreBoard;
     Level currentLevel;
     boolean changeLevel;
+    boolean gameOver;
     Node visibleNode;
     
     public void simpleInitApp() {  
         updateList = new ArrayList<Updatable>();
+        updateBuffer = new ArrayList<Updatable>();
         visibleNode = new Node();
         rootNode.attachChild(visibleNode);
         
-        currentLevel = new TownLevel(this);
+        currentLevel = new TutorialLevel(this);
     }
      
     public Node getVisibleNode(){
@@ -87,15 +90,25 @@ public class Game extends SimpleApplication{
         for(Updatable up: updateList){
             up.update();
         }
-        if(changeLevel){
+        if(gameOver){
+            currentLevel.dispose();
+            currentLevel = new HighScoreLevel(this);
+        }
+        else if(changeLevel){
             currentLevel.nextLevel();
             changeLevel = false;
         }
+        updateList.addAll(updateBuffer);
+        updateBuffer.clear();
     }
 
     
     public void setChangeLevel(boolean changeLevel){
         this.changeLevel = changeLevel;
+    }
+    
+    public void setGameOver(boolean over){
+        this.gameOver = over;
     }
     
     public void setBulletAppState(BulletAppState bAppState){
@@ -107,9 +120,13 @@ public class Game extends SimpleApplication{
     }
     
     public void addUpdateList(Updatable a){
-        updateList.add(a);
+        updateBuffer.add(a);
     }
     
+    public void clearUpdateList(){
+        updateList.clear();
+        updateBuffer.clear();
+    }
     
     public ScoreBoard getScoreBoard(){
         return scoreBoard;
