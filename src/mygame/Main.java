@@ -8,6 +8,7 @@ public class Main {
         Game app = new Game();
         AppSettings settings = new AppSettings(true);
         settings.setFrameRate(60);
+        settings.setResolution(840, 600);
         app.setSettings(settings);
         //app.setDisplayFps(false);
         app.setDisplayStatView(false);

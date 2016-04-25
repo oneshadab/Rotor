@@ -147,10 +147,8 @@ public class Player implements ActionListener, Updatable, Triggerable{
         }
         else if(bindings.equals("Crate")){
             if(isPressed){
-                Vector3f loc = cam.getLocation();
-                loc.addLocal(cam.getDirection().mult(40));
-                if(loc.y < 0) loc.y = 1;
-                Crate b = new Crate(loc, cam.getRotation(), this.game);
+                game.currentLevel.dispose();
+                game.currentLevel = new TutorialLevel(game);
             }
         }
     }
