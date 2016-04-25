@@ -43,7 +43,7 @@ public class TerrainLevel extends Level{
     public void nextLevel() {
         this.dispose();
         
-        game.setCurrentLevel(new HighScoreLevel(game));
+        game.setCurrentLevel(new HighScoreLevel(game, true));
     }
 
     @Override

@@ -92,7 +92,7 @@ public class Game extends SimpleApplication{
         }
         if(gameOver){
             currentLevel.dispose();
-            currentLevel = new HighScoreLevel(this);
+            currentLevel = new HighScoreLevel(this, false);
         }
         else if(changeLevel){
             currentLevel.nextLevel();

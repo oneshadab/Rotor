@@ -24,20 +24,23 @@ public class Scene implements Triggerable{
 
    
     
-    public Scene(Spatial sceneModel, Game game){
+    public Scene(Spatial sceneModel, Game game, float scale){
         this.sceneModel = sceneModel;
         this.rootNode = game.getRootNode();
         this.bAppState = game.getBulletAppState();
         
         Node t;
         
-        sceneModel.setLocalScale(2f);
+        sceneModel.setLocalScale(scale);
         sceneShape = CollisionShapeFactory.createMeshShape(sceneModel);
         this.setupControls();
         
         game.getVisibleNode().attachChild(sceneModel);
     }
-
+    
+    public Scene(Spatial sm, Game game){
+        this(sm, game, 2f);
+    }
      public void setupControls(){
         //ghostControl = new ObjectGhostControl(sceneShape, this);
         //sceneModel.addControl(ghostControl);

@@ -22,7 +22,7 @@ public class HighScoreLevel extends Level{
     Scene scene;
     ScoreBoard scoreBoard;
 
-    public HighScoreLevel(Game game) {  
+    public HighScoreLevel(Game game, boolean gameover) {  
         super(game);     
         game.getGuiNode().detachAllChildren();
         
@@ -30,7 +30,10 @@ public class HighScoreLevel extends Level{
         bmt = new BitmapText(game.getAssetManager().loadFont("Interface/Fonts/Default.fnt"));
         bmt.setQueueBucket(RenderQueue.Bucket.Inherit);
         bmt.setSize(25);
-        bmt.setText(" High Score\n\nYour Score: " + ScoreBoard.points);
+        if(gameover) 
+            bmt.setText("\n\n     Congrats!!\n\nYou Finished the game");
+        else
+            bmt.setText("\n\nEnemies killed: " + ScoreBoard.points);
         
         game.getGuiNode().attachChild(bmt);
         
@@ -40,6 +43,7 @@ public class HighScoreLevel extends Level{
         bmt.setLocalTranslation(new Vector3f(screenWidth - bmt.getLineWidth() - 250, screenHeight - 5, 0));
     }
 
+    
     @Override
     public ScoreBoard getScoreBoard() {
         return scoreBoard;

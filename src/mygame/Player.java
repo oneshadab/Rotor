@@ -162,6 +162,7 @@ public class Player implements ActionListener, Updatable, Triggerable{
     public void update(){
         updatePosition();
         updateWeapon();
+        //System.out.println(playerModel.getWorldTranslation());
     }
     
     public void setWeapon(Spatial weapon){

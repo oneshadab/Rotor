@@ -12,6 +12,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import java.util.ArrayList;
 
 public class TutorialLevel extends Level{
@@ -36,9 +37,10 @@ public class TutorialLevel extends Level{
         scoreBoard = new ScoreBoard(100, 0, game);
 
         
-        Revolver revolver = new Revolver(new Vector3f(-5f, 10f, 35f), game);
-        player = new Player(new Vector3f(10f, 10f, 35f), new CapsuleCollisionShape(1.5f, 6f, 1), game);
-        scene = new Scene(assetManager.loadModel("/Scenes/tutorialLevel/tutorialLevel.j3o"), game);
+        Revolver revolver = new Revolver(new Vector3f(-7f, 10f, 58f), game);
+        player = new Player(new Vector3f(101f, 10f, 63f), new CapsuleCollisionShape(1.5f, 6f, 1), game);
+        Spatial sp = assetManager.loadModel("/Scenes/test2.j3o");
+        scene = new Scene(sp, game, 10f);
                 
         
         
@@ -47,7 +49,7 @@ public class TutorialLevel extends Level{
         
         
         
-        Enemy oto = new Enemy(new Vector3f(0, 0, -35), 250, game);
+        Enemy oto = new Enemy(new Vector3f(50, 5, -50), game);
         oto.setInputMapping(inputManager, oto);
         
         //Material
@@ -56,7 +58,7 @@ public class TutorialLevel extends Level{
         //mat.setColor("Color", ColorRGBA.Blue);
         mat.setTexture("ColorMap", assetManager.loadTexture("Textures/crateTex1.png"));
         //scene.sceneModel.setMaterial(mat);
-        Exit exitBox = new Exit(new Vector3f(47f, 3f, 0f), Quaternion.IDENTITY, game, .2f);
+        Exit exitBox = new Exit(new Vector3f(102f, 5f, -50f), Quaternion.IDENTITY, game, .2f);
     }
 
     public Player getPlayer(){
